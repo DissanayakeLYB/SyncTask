@@ -10,38 +10,50 @@ const Sidebar = () => {
 
       {/* Navigation Links */}
       <nav className="space-y-0">
-        <a href="#" className="block hover:bg-gray-700 p-2 rounded">Dashboard</a>
-        <a href="#" className="block hover:bg-gray-700 p-2 rounded">Team</a>
-        <a href="#" className="block hover:bg-gray-700 p-2 rounded">Settings</a>
+        <a href="#" className="block hover:bg-blue-100 hover:text-blue-500 p-2 rounded mb-2 font-semibold">Dashboard</a>
+        <a href="#" className="block hover:bg-blue-100 hover:text-blue-500 p-2 rounded mb-2 font-semibold">Team</a>
+        <a href="#" className="block hover:bg-blue-100 hover:text-blue-500 p-2 rounded mb-2 font-semibold">Settings</a>
       </nav>
 
       {/* Team Members Section */}
       <div className="mt-8">
         <h3 className="text-sm font-semibold text-gray-400 mb-4">TEAM MEMBERS</h3>
         <ul className="space-y-3">
-          <li className="flex items-center space-x-3">
+          <li className="flex items-center space-x-3 my-6">
             <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center text-white">
               S
             </div>
-            <span>Sarah Wilson</span>
+            <div className="flex flex-col">
+              <span>Sarah Wilson</span>
+              <span className="text-xs text-gray-400">UI Designer</span>
+            </div>
           </li>
-          <li className="flex items-center space-x-3">
+          <li className="flex items-center space-x-3 my-6">
             <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center text-white">
               M
             </div>
-            <span>Michael Chen</span>
+            <div className="flex flex-col">
+              <span>Michael Chen</span>
+              <span className="text-xs text-gray-400">Developer</span>
+            </div>
           </li>
-          <li className="flex items-center space-x-3">
+          <li className="flex items-center space-x-3 my-6">
             <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center text-white">
               E
             </div>
-            <span>Emily Davis</span>
+            <div className="flex flex-col">
+              <span>Emily Davis</span>
+              <span className="text-xs text-gray-400">Product Manager</span>
+            </div>
           </li>
-          <li className="flex items-center space-x-3">
+          <li className="flex items-center space-x-3 my-6">
             <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center text-white">
               J
             </div>
-            <span>James Wilson</span>
+            <div className="flex flex-col">
+              <span>James Wilson</span>
+              <span className="text-xs text-gray-400">Developer</span>
+            </div>
           </li>
         </ul>
       </div>
