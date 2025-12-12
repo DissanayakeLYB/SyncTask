@@ -1,73 +1,56 @@
-# React + TypeScript + Vite
+# SyncTask
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern task management application with team collaboration features, built with React and TypeScript.
 
-Currently, two official plugins are available:
+## What is SyncTask?
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+SyncTask is a Kanban-styled task management board designed for teams to organize, track, and manage tasks efficiently. It provides real-time visibility into project progress with an intuitive interface for task filtering and team member availability tracking.
 
-## React Compiler
+## Key Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. **Kanban Board**: Organize tasks across three columns - Todo, Working, and Done
+2. **Team Filtering**: Click on team members to filter tasks by person
+3. **Leave Calendar**: Mark and track team member leaves on an interactive calendar
+4. **Dark Theme**: Eye-friendly dark mode throughout the application
+5. **User Profile**: Quick access to user details with logout functionality
+6. **Responsive Design**: Works seamlessly on different screen sizes
 
-## Expanding the ESLint configuration
+## Why Use SyncTask?
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Improved Collaboration**: See what each team member is working on
+- **Better Planning**: Track team availability and plan around leaves
+- **Clear Organization**: Visualize project progress at a glance
+- **Intuitive Interface**: Simple and clean design for easy adoption
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## How to Use
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Managing Tasks
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **Move Tasks**: Click the arrow buttons on task cards to move tasks to next columns
+- **Delete Tasks**: Click the delete button to remove a task
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Filtering by Team Member
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- Click on any team member's name in the left sidebar to filter tasks
+- Click again on the same name to clear the filter
+- Only tasks tagged with that person will be displayed
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### Marking Leaves
+
+- Navigate to the calendar in the left sidebar
+- Click on any date to mark team member leaves
+- Select the people who are on leave for that date
+- Click "Save" to confirm
+
+### User Profile
+
+- Click the circle avatar in the top-right corner
+- View your profile details
+- Click "Log out" to logout
+
+## Technologies Used
+
+- React + TypeScript
+- Vite (build tool)
+- Tailwind CSS (styling)
+- Lucide React (icons)
