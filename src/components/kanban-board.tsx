@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Trash2, ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 
 interface Task {
   id: string;
@@ -7,6 +7,23 @@ interface Task {
   deadline: string;
   level: "todo" | "working" | "done";
   tags: string[];
+}
+
+interface ApiTask {
+  taskDescription: string;
+  status: "todo" | "working" | "done";
+  responsible: string[];
+}
+
+interface LeaveDate {
+  year: number;
+  month: number;
+  day: number;
+}
+
+interface Leave {
+  name: string;
+  leave_dates: LeaveDate[];
 }
 
 interface ModalState {
@@ -35,6 +52,8 @@ export default function KanbanBoard({
 }) {
   const [taskLevel, _] = useState("todo");
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [leaves, setLeaves] = useState<Leave[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [taskInput, setTaskInput] = useState("");
   const [deadlineInput, setDeadlineInput] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -43,6 +62,20 @@ export default function KanbanBoard({
     type: null,
     task: null,
   });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        await Promise.all([getTaskDetails(), getLeaveDetails()]);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   function toggleTag(tag: string) {
     setSelectedTags((prev) =>
@@ -144,6 +177,51 @@ export default function KanbanBoard({
     return tasks.filter((task) => task.tags.includes(selectedPerson));
   };
 
+  const getTaskDetails = async () => {
+    const tasksDetails = await fetch(
+      "https://synctask-backend-production.up.railway.app/tasks"
+    );
+    const taskData: ApiTask[] = await tasksDetails.json();
+
+    // Transform API tasks to our Task interface
+    const transformedTasks: Task[] = taskData
+      .filter((task): task is ApiTask => task !== null) // Filter out null entries
+      .map((task, index) => ({
+        id: `api-${index}-${Date.now()}`,
+        title: task.taskDescription,
+        deadline: "Not specified",
+        level: task.status,
+        tags: task.responsible.map(
+          (name) => name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
+        ),
+      }));
+
+    setTasks((prevTasks) => [...transformedTasks, ...prevTasks]);
+  };
+
+  const getLeaveDetails = async () => {
+    const leavesDetails = await fetch(
+      "https://synctask-backend-production.up.railway.app/leaves"
+    );
+    const leavesData: Leave[] = await leavesDetails.json();
+    setLeaves(leavesData);
+  };
+
+  // Helper function to format leave dates
+  const formatLeaveDate = (date: LeaveDate): string => {
+    return `${date.year}-${String(date.month).padStart(2, "0")}-${String(
+      date.day
+    ).padStart(2, "0")}`;
+  };
+
+  // Check if a person is on leave today or upcoming
+  const getPersonLeaveInfo = (personName: string): LeaveDate[] => {
+    const personLeave = leaves.find(
+      (leave) => leave.name.toLowerCase() === personName.toLowerCase()
+    );
+    return personLeave?.leave_dates || [];
+  };
+
   const renderTasks = (level: string) => {
     const filteredTasks = getFilteredTasks();
     return filteredTasks
@@ -213,6 +291,11 @@ export default function KanbanBoard({
 
   return (
     <section className="bg-slate-950 min-h-screen">
+      {isLoading && (
+        <div className="flex justify-center items-center py-4">
+          <div className="text-slate-400">Loading tasks...</div>
+        </div>
+      )}
       <div className="flex flex-col gap-4 mb-8 px-8 pt-4">
         <div className="flex flex-col gap-3 mb-4">
           <div className="flex flex-col md:flex-row gap-4">
@@ -235,19 +318,30 @@ export default function KanbanBoard({
           <div className="flex flex-wrap gap-2">
             {PEOPLE.map((person) => {
               const active = selectedTags.includes(person);
+              const personLeaves = getPersonLeaveInfo(person);
+              const hasUpcomingLeave = personLeaves.length > 0;
               return (
                 <button
                   key={person}
                   type="button"
                   onClick={() => toggleTag(person)}
-                  className={`px-3 py-1 text-sm rounded-full border transition ${
+                  className={`px-3 py-1 text-sm rounded-full border transition flex items-center gap-1 ${
                     active
                       ? "bg-blue-600 border-blue-500 text-white"
                       : "bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600"
                   }`}
-                  title={`Tag ${person}`}
+                  title={
+                    hasUpcomingLeave
+                      ? `${person} - On leave: ${personLeaves
+                          .map((d) => formatLeaveDate(d))
+                          .join(", ")}`
+                      : `Tag ${person}`
+                  }
                 >
                   {person}
+                  {hasUpcomingLeave && (
+                    <Calendar size={12} className="text-yellow-400" />
+                  )}
                 </button>
               );
             })}
