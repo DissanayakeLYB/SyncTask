@@ -3,11 +3,9 @@ import { Command } from "lucide-react";
 
 import { NavLecturers } from "@/components/nav-lecturers";
 import { DatePicker } from "@/components/date-picker";
-import { TeamSwitcher } from "@/components/team-switcher";
 import {
   Sidebar,
   SidebarContent,
-  SidebarHeader,
   SidebarRail,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
@@ -77,9 +75,6 @@ export function SidebarLeft({
 }) {
   return (
     <Sidebar className="border-r-0" {...props}>
-      <SidebarHeader>
-        <TeamSwitcher />
-      </SidebarHeader>
       <SidebarContent className="flex flex-col gap-3 overflow-y-auto">
         <div className="space-y-3">
           <NavLecturers
