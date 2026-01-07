@@ -357,7 +357,7 @@ export default function KanbanBoard({
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 justify-evenly">
           <div className="rounded-b-xl">
-            <div className="p-4 bg-red-600 rounded-t-xl text-white">
+            <div className="p-4 bg-red-600 rounded-xl text-white">
               <h3 className="font-bold text-2xl">Todo</h3>
               <p>
                 {getFilteredTasks().filter((t) => t.level === "todo").length}{" "}
@@ -367,7 +367,7 @@ export default function KanbanBoard({
             <div id="todo">{renderTasks("todo")}</div>
           </div>
           <div className="rounded-b-xl">
-            <div className="p-4 bg-yellow-600 rounded-t-xl text-white">
+            <div className="p-4 bg-yellow-600 rounded-xl text-white">
               <h3 className="font-bold text-2xl">Working</h3>
               <p>
                 {getFilteredTasks().filter((t) => t.level === "working").length}{" "}
@@ -377,7 +377,7 @@ export default function KanbanBoard({
             <div id="working">{renderTasks("working")}</div>
           </div>
           <div className="rounded-b-xl">
-            <div className="p-4 bg-green-600 rounded-t-xl text-white">
+            <div className="p-4 bg-green-600 rounded-xl text-white">
               <h3 className="font-bold text-2xl">Done</h3>
               <p>
                 {getFilteredTasks().filter((t) => t.level === "done").length}{" "}
