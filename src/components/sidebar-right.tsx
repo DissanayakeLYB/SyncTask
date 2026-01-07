@@ -13,7 +13,7 @@ const data = {
   user: {
     name: "Lasith Dissanayake",
     email: "dissanayakelyb.20@uom.lk",
-    emoji: "😄",
+    emoji: "💻",
   },
 };
 

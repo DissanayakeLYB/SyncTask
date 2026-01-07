@@ -179,7 +179,7 @@ export default function KanbanBoard({
 
   const getTaskDetails = async () => {
     const tasksDetails = await fetch(
-      "https://synctask-backend-production.up.railway.app/tasks"
+      "https://sync-task-uom-mse-instructors-backend.vercel.app/tasks"
     );
     const taskData: ApiTask[] = await tasksDetails.json();
 
@@ -201,7 +201,7 @@ export default function KanbanBoard({
 
   const getLeaveDetails = async () => {
     const leavesDetails = await fetch(
-      "https://synctask-backend-production.up.railway.app/leaves"
+      "https://sync-task-uom-mse-instructors-backend.vercel.app/leaves"
     );
     const leavesData: Leave[] = await leavesDetails.json();
     setLeaves(leavesData);

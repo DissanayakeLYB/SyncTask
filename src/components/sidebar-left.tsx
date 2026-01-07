@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Command } from "lucide-react";
 
 import { NavLecturers } from "@/components/nav-lecturers";
 import { DatePicker } from "@/components/date-picker";
@@ -11,14 +10,6 @@ import {
 } from "@/components/ui/sidebar";
 
 const data = {
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: Command,
-      plan: "Enterprise",
-    },
-  ],
-
   people: [
     {
       name: "Nuwanga Akalanka",
@@ -33,16 +24,12 @@ const data = {
       emoji: "🤣",
     },
     {
-      name: "Lahiru Jayasekara",
-      emoji: "😺",
-    },
-    {
       name: "Dileka Sathsarani",
       emoji: "🚀",
     },
     {
       name: "Lasith Dissanayake",
-      emoji: "😎",
+      emoji: "💻",
     },
     {
       name: "Ashen Gunasekara",
@@ -56,12 +43,16 @@ const data = {
       name: "Nayomi Dedunu",
       emoji: "🌈",
     },
+    {
+      name: "Shalitha Pathum",
+      emoji: "😌",
+    },
   ],
 
   user: {
     name: "Lasith Dissanayake",
     email: "dissanayakelyb.20@uom.lk",
-    emoji: "😄",
+    emoji: "💻",
   },
 };
 
