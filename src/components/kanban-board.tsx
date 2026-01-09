@@ -1,18 +1,28 @@
 import { useState, useEffect } from "react";
 import { Trash2, ChevronLeft, ChevronRight, Calendar } from "lucide-react";
+import type { ApiTask as BackendTask } from "../lib/utils";
+import {
+  fetchTasks,
+  fetchLeaves,
+  createTask,
+  updateTaskStatus,
+  deleteTask,
+} from "../lib/utils";
+
+type singleTaskLevel = "todo" | "working" | "done";
 
 interface Task {
   id: string;
   title: string;
   deadline: string;
-  level: "todo" | "working" | "done";
+  level: singleTaskLevel;
   tags: string[];
+  backendId?: string;
 }
 
-interface ApiTask {
-  taskDescription: string;
-  status: "todo" | "working" | "done";
-  responsible: string[];
+// Map backend task id variants to a single id
+function getBackendId(t: BackendTask): string | undefined {
+  return t.id ?? t._id;
 }
 
 interface LeaveDate {
@@ -30,19 +40,19 @@ interface ModalState {
   isOpen: boolean;
   type: "delete" | "move" | null;
   task: Task | null;
-  newLevel?: "todo" | "working" | "done";
+  newLevel?: singleTaskLevel;
 }
 
 const PEOPLE = [
   "Nuwanga",
   "Charuka",
   "Pramodi",
-  "Lahiru",
   "Dileka",
   "Lasith",
   "Ashen",
-  "Dedunu",
   "Warsha",
+  "Dedunu",
+  "Shalitha",
 ];
 
 export default function KanbanBoard({
@@ -50,7 +60,7 @@ export default function KanbanBoard({
 }: {
   selectedPerson: string | null;
 }) {
-  const [taskLevel, _] = useState("todo");
+  const [taskLevel] = useState("todo");
   const [tasks, setTasks] = useState<Task[]>([]);
   const [leaves, setLeaves] = useState<Leave[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -83,21 +93,37 @@ export default function KanbanBoard({
     );
   }
 
-  function addTask() {
-    if (taskInput && deadlineInput) {
-      const newTask: Task = {
-        id: Date.now().toString(),
-        title: taskInput,
-        deadline: deadlineInput,
-        level: taskLevel as "todo" | "working" | "done",
-        tags: selectedTags,
+  async function addTask() {
+    if (!taskInput || !deadlineInput) {
+      alert("Please enter both task and deadline.");
+      return;
+    }
+    try {
+      const payload = {
+        taskDescription: taskInput,
+        status: taskLevel as singleTaskLevel,
+        responsible: selectedTags.map((t) => t.toLowerCase()),
       };
-      setTasks([...tasks, newTask]);
+      const created = await createTask(payload);
+      const createdObj =
+        typeof created === "object" && created !== null
+          ? (created as BackendTask)
+          : null;
+      const newTask: Task = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        title: createdObj?.taskDescription ?? taskInput,
+        deadline: deadlineInput,
+        level: createdObj?.status ?? (taskLevel as singleTaskLevel),
+        tags: selectedTags,
+        backendId: createdObj ? getBackendId(createdObj) : undefined,
+      };
+      setTasks((prev) => [newTask, ...prev]);
       setTaskInput("");
       setDeadlineInput("");
       setSelectedTags([]);
-    } else {
-      alert("Please enter both task and deadline.");
+    } catch (err) {
+      console.error("Failed to create task:", err);
+      alert("Failed to create task on server.");
     }
   }
 
@@ -109,7 +135,7 @@ export default function KanbanBoard({
     });
   }
 
-  function openMoveModal(task: Task, newLevel: "todo" | "working" | "done") {
+  function openMoveModal(task: Task, newLevel: singleTaskLevel) {
     setModalState({
       isOpen: true,
       type: "move",
@@ -126,22 +152,42 @@ export default function KanbanBoard({
     });
   }
 
-  function confirmDelete() {
+  async function confirmDelete() {
     if (modalState.task) {
-      setTasks(tasks.filter((task) => task.id !== modalState.task!.id));
+      const backendId = modalState.task.backendId;
+      try {
+        if (backendId) {
+          await deleteTask(backendId);
+        }
+        setTasks((prev) =>
+          prev.filter((task) => task.id !== modalState.task!.id)
+        );
+      } catch (err) {
+        console.error("Failed to delete task:", err);
+        alert("Failed to delete task on server.");
+      }
     }
     closeModal();
   }
 
-  function confirmMove() {
+  async function confirmMove() {
     if (modalState.task && modalState.newLevel) {
-      setTasks(
-        tasks.map((task) =>
-          task.id === modalState.task!.id
-            ? { ...task, level: modalState.newLevel! }
-            : task
-        )
-      );
+      const backendId = modalState.task.backendId;
+      try {
+        if (backendId) {
+          await updateTaskStatus(backendId, modalState.newLevel);
+        }
+        setTasks((prev) =>
+          prev.map((task) =>
+            task.id === modalState.task!.id
+              ? { ...task, level: modalState.newLevel! }
+              : task
+          )
+        );
+      } catch (err) {
+        console.error("Failed to move task:", err);
+        alert("Failed to update task on server.");
+      }
     }
     closeModal();
   }
@@ -154,17 +200,15 @@ export default function KanbanBoard({
     }
   }
 
-  function getNextLevel(
-    currentLevel: "todo" | "working" | "done"
-  ): "todo" | "working" | "done" | null {
+  function getNextLevel(currentLevel: singleTaskLevel): singleTaskLevel | null {
     if (currentLevel === "todo") return "working";
     if (currentLevel === "working") return "done";
     return null;
   }
 
   function getPreviousLevel(
-    currentLevel: "todo" | "working" | "done"
-  ): "todo" | "working" | "done" | null {
+    currentLevel: singleTaskLevel
+  ): singleTaskLevel | null {
     if (currentLevel === "done") return "working";
     if (currentLevel === "working") return "todo";
     return null;
@@ -178,14 +222,10 @@ export default function KanbanBoard({
   };
 
   const getTaskDetails = async () => {
-    const tasksDetails = await fetch(
-      "https://sync-task-uom-mse-instructors-backend.vercel.app/tasks"
-    );
-    const taskData: ApiTask[] = await tasksDetails.json();
+    const taskData = await fetchTasks();
 
-    // Transform API tasks to our Task interface
     const transformedTasks: Task[] = taskData
-      .filter((task): task is ApiTask => task !== null) // Filter out null entries
+      .filter((task): task is BackendTask => task !== null)
       .map((task, index) => ({
         id: `api-${index}-${Date.now()}`,
         title: task.taskDescription,
@@ -194,16 +234,14 @@ export default function KanbanBoard({
         tags: task.responsible.map(
           (name) => name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
         ),
+        backendId: getBackendId(task),
       }));
 
     setTasks((prevTasks) => [...transformedTasks, ...prevTasks]);
   };
 
   const getLeaveDetails = async () => {
-    const leavesDetails = await fetch(
-      "https://sync-task-uom-mse-instructors-backend.vercel.app/leaves"
-    );
-    const leavesData: Leave[] = await leavesDetails.json();
+    const leavesData: Leave[] = await fetchLeaves();
     setLeaves(leavesData);
   };
 

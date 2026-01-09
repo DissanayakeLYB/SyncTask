@@ -22,11 +22,9 @@ const PEOPLE = [
 ];
 
 export function DatePicker() {
-  const today = new Date();
+  const today 
   const [leaves, setLeaves] = useState<Leave[]>([]);
-  const [currentDate, setCurrentDate] = useState(
-    new Date(today.getFullYear(), today.getMonth(), today.getDate())
-  );
+  const [currentDate, setCurrentDate] = useState(new Date(2025, 11, 12));
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
     selectedDate: string | null;
